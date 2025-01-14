@@ -169,3 +169,9 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+#
+alembic/versions/*.pyc
+.DS_Store
+*.tfstate
+*.tfstate.backup
