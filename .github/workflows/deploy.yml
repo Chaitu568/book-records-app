@@ -2,6 +2,15 @@ name: Deploy to Heroku
 
 on:
   workflow_dispatch:
+    inputs:
+      action:
+        description: "Choose Terraform action"
+        required: true
+        default: "apply"
+        type: choice
+        options:
+          - "apply"
+          - "destroy"
 
 jobs:
   deploy:
@@ -27,14 +36,31 @@ jobs:
         with:
           terraform_version: '1.0.0'
 
-      - name: Configure Terraform and Apply
+      # - name: Configure Terraform and Apply
+      #   env:
+      #     HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+      #   run: |
+      #     cd terraform
+      #     terraform init
+      #     terraform apply -auto-approve
+      - name: Terraform Init
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
           cd terraform
           terraform init
-          terraform apply -auto-approve
-          
+
+      - name: Terraform Apply or Destroy
+        env:
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          cd terraform
+          if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
+            terraform destroy -auto-approve
+          else
+            terraform apply -auto-approve
+          fi    
+
       - name: Commit and Push Updated State
         run: |
           git config --global user.name "GitHub Actions Bot"
@@ -44,20 +70,23 @@ jobs:
           git push
 
       - name: Login to Heroku
+        if: ${{ github.event.inputs.action == 'apply' }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: heroku container:login
 
       - name: Build and push Docker image
+        if: ${{ github.event.inputs.action == 'apply' }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          APP_NAME: book-recors-app
+          APP_NAME: book-records-app
         run: |
           docker build -t registry.heroku.com/$APP_NAME/web .
           docker push registry.heroku.com/$APP_NAME/web
 
       - name: Release
+        if: ${{ github.event.inputs.action == 'apply' }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          APP_NAME: book-recors-app
+          APP_NAME: book-records-app
         run: heroku container:release web -a $APP_NAME
