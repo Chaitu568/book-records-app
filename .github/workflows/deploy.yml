@@ -69,6 +69,11 @@ jobs:
           git commit -m "Update Terraform state [skip ci]" || echo "No changes to commit"
           git push
 
+      - name: Install Heroku CLI
+        if: ${{ github.event.inputs.action == 'apply' }}
+        run: |
+          curl https://cli-assets.heroku.com/install.sh | sh
+          
       - name: Login to Heroku
         if: ${{ github.event.inputs.action == 'apply' }}
         env:
