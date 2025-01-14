@@ -1,16 +1,9 @@
 name: Deploy to Heroku
 
 on:
+  # push:
+  #   branches: [ "main" ]
   workflow_dispatch:
-    inputs:
-      action:
-        description: "Choose Terraform action"
-        required: true
-        default: "apply"
-        type: choice
-        options:
-          - "apply"
-          - "destroy"
 
 jobs:
   deploy:
@@ -21,77 +14,29 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10.13'
-
-      - name: Install pip-tools
-        run: |
-          python -m pip install --upgrade pip
-          pip install pip-tools
+          python-version: "3.10"
 
       - name: Install dependencies
-        run: pip-sync
-
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: '1.0.0'
-
-      # - name: Configure Terraform and Apply
-      #   env:
-      #     HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-      #   run: |
-      #     cd terraform
-      #     terraform init
-      #     terraform apply -auto-approve
-      - name: Terraform Init
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          cd terraform
-          terraform init
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Terraform Apply or Destroy
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          cd terraform
-          if [ "${{ github.event.inputs.action }}" == "destroy" ]; then
-            terraform destroy -auto-approve
-          else
-            terraform apply -auto-approve
-          fi    
-
-      - name: Commit and Push Updated State
-        run: |
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "actions@github.com"
-          git add -f terraform/terraform.tfstate*
-          git commit -m "Update Terraform state [skip ci]" || echo "No changes to commit"
-          git push
-
+      
       - name: Install Heroku CLI
         if: ${{ github.event.inputs.action == 'apply' }}
         run: |
-          curl https://cli-assets.heroku.com/install.sh | sh
-          
+          curl https://cli-assets.heroku.com/install.sh | sh    
+
       - name: Login to Heroku
-        if: ${{ github.event.inputs.action == 'apply' }}
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: heroku container:login
-
-      - name: Build and push Docker image
-        if: ${{ github.event.inputs.action == 'apply' }}
-        env:
-          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          APP_NAME: book-records-app
         run: |
-          docker build -t registry.heroku.com/$APP_NAME/web .
-          docker push registry.heroku.com/$APP_NAME/web
+          # Option 1: Use the Heroku CLI directly
+          echo "$HEROKU_API_KEY" | heroku auth:token
+          heroku git:remote -a <your-heroku-app-name>
 
-      - name: Release
-        if: ${{ github.event.inputs.action == 'apply' }}
+      - name: Deploy via Git
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-          APP_NAME: book-records-app
-        run: heroku container:release web -a $APP_NAME
+        run: |
+          git push heroku HEAD:main --force
