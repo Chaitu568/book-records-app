@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from starlette.responses import StreamingResponse
 import asyncio
 from datetime import datetime
+from fastapi.middleware.cors import CORSMiddleware
 
 from app import models, schemas, crud, auth, db, utils
 
@@ -14,6 +15,21 @@ app = FastAPI(
     description="CRUD operations for managing books, with JWT authentication and real-time updates.",
     version="1.0.0"
 )
+
+
+# Add CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Adjust to specific domains in production
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the Book Records App"}
+
 
 # Dependency to get DB session
 def get_db():
