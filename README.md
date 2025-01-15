@@ -93,7 +93,6 @@ Build the Image
 
 Run the Container
 
-# Run the container
 `docker run -p 8000:8000 -e PORT=8000 book-records-app`
 
 
@@ -119,8 +118,7 @@ Real-time Updates
    * HTML interface for viewing real-time book updates
 * GET /stream/data
    * SSE endpoint for real-time book operation events
-* this migh look vague if I pased these
-* can you help hin readme file format
+
 
 
 ##Infrastructure as Code (IaC)
