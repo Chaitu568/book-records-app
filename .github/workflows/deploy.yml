@@ -33,8 +33,12 @@ jobs:
           echo "$HEROKU_API_KEY" | heroku auth:token
           heroku git:remote -a book-records-app
 
-      - name: Deploy via Git
+      - name: Set Heroku Remote
+        run: |
+          git remote remove heroku || true
+          git remote add heroku https://heroku:${HEROKU_API_KEY}@git.heroku.com/<your-heroku-app-name>.git
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
-        run: |
-          git push heroku HEAD:main --force
+
+      - name: Push to Heroku
+        run: git push heroku HEAD:main --force
