@@ -30,9 +30,8 @@ jobs:
         env:
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
-          # Option 1: Use the Heroku CLI directly
           echo "$HEROKU_API_KEY" | heroku auth:token
-          heroku git:remote -a <your-heroku-app-name>
+          heroku git:remote -a book-records-app
 
       - name: Deploy via Git
         env:
