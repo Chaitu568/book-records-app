@@ -1,4 +1,9 @@
-This README provides:
+# FastAPI Book Records App
+
+A robust RESTful API service built with FastAPI for managing book records, featuring real-time updates via Server-Sent Events (SSE).
+
+
+## This read me provides:
 - Clear project overview
 - Setup instructions
 - Detailed endpoint documentation
@@ -7,9 +12,7 @@ This README provides:
 - Future improvements
 
 
-# FastAPI Book Records App
 
-A robust RESTful API service built with FastAPI for managing book records, featuring real-time updates via Server-Sent Events (SSE).
 
 ## Features
 - CRUD operations for book management
@@ -29,23 +32,8 @@ A robust RESTful API service built with FastAPI for managing book records, featu
 
 ## Project Structure
 
-book-records-app/
-├── app/
-│   ├── crud.py
-│   ├── models.py
-│   ├── schemas.py
-│   ├── auth.py
-│   ├── utils.py
-│   ├── events.py
-│   └── db.py
-├── terraform/
-│   ├── main.tf
-│   ├── variables.tf
-│   └── outputs.tf
-├── main.py
-├── Pipfile
-├── Pipfile.lock
-└── Procfile
+
+![alt text](image.png)
 
 
 ## Environment Setup
@@ -77,9 +65,10 @@ pipenv shell
 
 # Run the application
 uvicorn app.main:app --reload
+```
 
 
-## Docker Setup
+## Docker Setup(second way of running application)
 
 ### Prerequisites
 - Docker installed on your machine
@@ -87,17 +76,17 @@ uvicorn app.main:app --reload
 ### Docker Configuration
 The application includes a Dockerfile for containerization, making it easy to run in any environment.
 
-Build the Image
+### Build the Image
 
 `docker build -t book-records-app .`
 
-Run the Container
+### Run the Container
 
 `docker run -p 8000:8000 -e PORT=8000 book-records-app`
 
 
 ## API Endpoints
-Authentication
+### Authentication
 * POST /login
    * Authenticate user and receive JWT token
    * Required for accessing protected endpoints
@@ -121,41 +110,70 @@ Real-time Updates
 
 
 
-##Infrastructure as Code (IaC)
-Terraform Implementation
-The project uses Terraform for infrastructure management, providing:
+## Infrastructure as Code (IaC)
+- Terraform Implementation
+- The project uses Terraform for infrastructure management, providing:
 
-Consistent environment creation
-Version-controlled infrastructure
-Easy scaling and modifications
-Reproducible deployments
-Cost-effective resource management
+- Consistent environment creation
+- Version-controlled infrastructure
+- Easy scaling and modifications
+- Reproducible deployments
+- Cost-effective resource management
 
-State Management
+### State Management
 
-State files are committed to Git for simplicity
-Remote state hosting can be implemented for production environments
-State changes are tracked through version control
+- State files are committed to Git for simplicity
+- Remote state hosting can be implemented for production environments
+- State changes are tracked through version control
 
-Security
+### Security
 
-Environment variables managed through GitHub Secrets
-Sensitive data never committed to repository
-Terraform variables used for configuration
+- Environment variables managed through GitHub Secrets
+- Sensitive data never committed to repository
+- Terraform variables used for configuration
 
-Testing
-Test users with IDs 2 and 9 have been removed as they were used for testing purposes.
-Known Limitations
+## Testing
+## Authentication Setup
 
-SQLite database used for simplicity (can be migrated to PostgreSQL for production)
-Local state management in Terraform (can be upgraded to remote state)
+### Creating a New User
+Before using the API endpoints, you need to create a user and obtain a JWT token.
 
-Future Improvements
+1. Create a user using the `/users/` endpoint:
+```http
+POST /users/
 
-Implement remote state management for Terraform
-Add database migrations
-Enhance test coverage
-Add monitoring and logging
+{
+    "username": "testuser",
+    "password": "yourpassword123"
+}
 
-License
+Response:
+
+{
+    "id": 1,
+    "username": "testuser",
+    "is_active": true
+}
+```
+
+- In Swagger UI (/docs):
+
+- Click the "Authorize" button at the top
+- enter you user name and password, you will hae you session for 30 mins
+- you can try out all the endpoints.
+
+- Test users with IDs 2 and 9 have been removed as they were used for testing purposes.
+- Known Limitations
+
+- SQLite database used for simplicity (can be migrated to PostgreSQL for production)
+- Local state management in Terraform (can be upgraded to remote state)
+
+## Future Improvements
+
+- Implement remote state management for Terraform
+- Add database migrations
+- Enhance test coverage
+- Add monitoring and logging
+
+### License
 MIT License
