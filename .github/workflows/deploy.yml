@@ -23,7 +23,6 @@ jobs:
 
       
       - name: Install Heroku CLI
-        if: ${{ github.event.inputs.action == 'apply' }}
         run: |
           curl https://cli-assets.heroku.com/install.sh | sh    
 
